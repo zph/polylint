@@ -1,0 +1,80 @@
+---
+# Must be lower than or equal the version of the polylint tool to be valid
+version: v0.0.1
+# TODO: Future extension to config file to allow for including other configuration's rules
+# these will be appended to the rules defined locally
+includes:
+- path: examples/basic.yml
+  sha: 4f641f6ccd8582e0e3f33e295d2c4d6a07495a49c0f7cee5aee318720b113d23
+# - path: https://example.com/other/config.yml
+#   sha: 123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+rules:
+- id: no-print
+  description: "Don't use print()"
+  recommendation: "Use logging instead."
+  severity: low
+  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  include_paths: '\.py$'
+  exclude_paths: null
+  fn:
+    type: builtin
+    scope: line
+    name: contains
+    args: ['print(']
+- id: no-logging
+  description: "Don't use logging"
+  recommendation: "Use print instead."
+  severity: low
+  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  include_paths: '\.py$'
+  exclude_paths: null
+  fn:
+    type: builtin
+    scope: line
+    name: regexp
+    args: ['^logging']
+- id: no-print-js
+  description: "Don't use print()"
+  recommendation: "Use logging instead."
+  severity: low
+  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  include_paths: '\.py$'
+  exclude_paths: null
+  fn:
+    type: js
+    scope: line
+    name: printRule
+    body: |
+      function printRule(path, idx, line) {
+        return line.includes('print')
+      }
+- id: no-print-js-file-level
+  description: "Don't use print()"
+  recommendation: "Use logging instead."
+  severity: low
+  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  include_paths: '\.py$'
+  exclude_paths: null
+  fn:
+    type: js
+    scope: file
+    name: printRule
+    body: |
+      function printRule(path, idx, line) {
+        return line.includes('print')
+      }
+- id: no-print-js-path-level
+  description: "Don't use print()"
+  recommendation: "Use logging instead."
+  severity: low
+  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  include_paths: '\.py$'
+  exclude_paths: null
+  fn:
+    type: js
+    scope: path
+    name: printRule
+    body: |
+      function printRule(path, _idx, _line) {
+        return path.includes('print')
+      }

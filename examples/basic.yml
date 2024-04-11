@@ -1,0 +1,15 @@
+---
+version: v0.0.1
+rules:
+- id: no-print-embed
+  description: "Don't use print()"
+  recommendation: "Use logging instead."
+  severity: low
+  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  include_paths: '\.py$'
+  exclude_paths: null
+  fn:
+    type: builtin
+    scope: line
+    name: contains
+    args: ['print(']
