@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	pl "github.com/zph/polylint/pkg"
 )
 
@@ -32,7 +33,13 @@ func Run(cmd *cobra.Command, args []string) (int, []error) {
 	exitCode = 0
 	var errs []error
 	for _, root := range args {
-		configRaw, err := os.ReadFile(cfgFile)
+		// Resolve symlinks
+		s, err := os.Readlink(viper.ConfigFileUsed())
+		if err == nil {
+			cfgFile = s
+		}
+		configRaw, err := os.ReadFile(viper.ConfigFileUsed())
+
 		if err != nil {
 			panic(err)
 		}
@@ -90,7 +97,6 @@ func RunCmd(cmd *cobra.Command, args []string) {
 	exitCode, errs := Run(cmd, args)
 	if len(errs) > 0 {
 		fmt.Printf("Errors: %+v", errs)
-		panic(errs)
 	}
 	os.Exit(exitCode)
 }

@@ -61,6 +61,7 @@ func initConfig() {
 		cobra.CheckErr(err)
 
 		// Search config in home directory with name ".polylint" (without extension).
+		viper.AddConfigPath(".")
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".polylint")
