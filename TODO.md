@@ -1,0 +1,40 @@
+# TODO
+
+- [x] Standard linters built using golang functions
+  - [x] contains
+  - [x] regexp match
+- [x] Ignore mechanisms
+  - [x] Ignore full file
+    - [x] polylint disable-for-file=$RULE_ID
+  - [x] Ignore next line
+    - [x] polylint disable-next-line=$RULE_ID
+    - [x] polylint disable=$RULE_ID
+  - [x] Ignore for path match
+    - [x] polylint disable-for-path=$RULE_ID,$RULE_ID2
+- [x] Types of rules
+  - [x] line
+  - [x] file content
+  - [x] file path
+- [ ] Builtin linters configured for use in config file
+- [x] Plugin linters configured for use in config file
+  - [x] otto / goja / v8go
+  - [x] supports line / file / path types
+- [x] Use cobra for CLI
+- [x] Build in a way to source rules from remote locations, via path + sha?
+  - [x] ie re-usable plugin infrastructure
+  - [x] support include statements
+  - [x] support SHA hash requirement for includes
+  - [ ] support caching
+- [x] Rename rules to... rules or validations?
+- [x] Add validation that the version of config file is supported
+- [ ] Ensure that we confirm uniqueness of rule ids at the  beginning of run during a pre-flight check
+- [x] Replace argv[0] option to accept:
+  - a directory
+  - many files passed as argv
+  - [deferred]a testing config file used as virtual filesystem
+- [ ] Set the severity threshold for what constitutes a non-zero exit code
+- [ ] Add pluggable output reporters
+  - [ ] Textual / table based reporter
+  - [ ] Colored output
+  - [ ] JSON reporter
+- [ ] Configurable logging (log levels for debugging and k/v log values)

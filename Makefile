@@ -19,3 +19,6 @@ test:
 
 test-watch:
 	watchexec -e go,yml,yaml -- go test -v .
+
+benchmark:
+	hyperfine --ignore-failure -- "./bin/polylint --config examples/simple.yaml run ~/src/runbook"
