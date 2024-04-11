@@ -1,4 +1,4 @@
-package main
+package polylint
 
 import (
 	"crypto/sha256"
@@ -17,12 +17,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var PolylintVersion string
-
-func init() {
-	PolylintVersion = "v0.0.1"
-}
-
 // TODO: use more efficient data structure... like map[int]Ignore where int = line number
 func extractIgnoresFromLine(line string, lineNo int, f *FileReport) error {
 	if strings.Contains(line, "polylint disable") {
@@ -40,6 +34,11 @@ func extractIgnoresFromLine(line string, lineNo int, f *FileReport) error {
 			for _, ignore := range ignores {
 				nextLineNo := lineNo + 1
 				f.Ignores = append(f.Ignores, Ignore{Scope: lineScope, SourceLineNo: lineNo, LineNo: nextLineNo, Id: ignore})
+			}
+		} else if directive == "disable-for-path" {
+			ignores := strings.Split(ignoresStr, ",")
+			for _, ignore := range ignores {
+				f.Ignores = append(f.Ignores, Ignore{Scope: pathScope, SourceLineNo: lineNo, LineNo: 0, Id: ignore})
 			}
 		} else {
 			fmt.Printf("WARNING: directive for polylint not recognized on line %d %s %s\n", lineNo, directive, ignoresStr)
@@ -85,7 +84,7 @@ func processLine(line string, idx int, f *FileReport) error {
 		if rule.IncludePaths != nil && rule.IncludePaths.MatchString(f.Path) {
 			if _, ok := ignores[rule.Id]; !ok {
 				if rule.Fn(f.Path, idx, line) {
-					finding := Finding{Path: f.Path, LineNo: lineNo, LineIndex: idx, Line: line, Rule: &rule, RuleId: rule.Id}
+					finding := Finding{Path: f.Path, LineNo: lineNo, LineIndex: idx, Line: line, Rule: rule, RuleId: rule.Id}
 					f.Findings = append(f.Findings, finding)
 				}
 			}
@@ -368,30 +367,38 @@ func ProcessFile(content string, path string, cfg ConfigFile) (FileReport, error
 		Findings: []Finding{},
 	}
 
-	for _, c := range f.Rules {
-		if !(c.Scope == fileScope || c.Scope == pathScope) {
-			continue
-		}
-
-		lineIdx := -1
-		lineNo := 0
-		if c.Fn(f.Path, lineIdx, content) {
-			f.Findings = append(f.Findings, Finding{
-				Path:      f.Path,
-				Line:      content,
-				LineIndex: lineIdx,
-				LineNo:    lineNo,
-				Rule:      &c,
-				RuleId:    c.Id,
-			})
-		}
-	}
-
 	lines := strings.Split(content, "\n")
 	for idx, line := range lines {
 		err := processLine(line, idx, &f)
 		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
 			return FileReport{}, err
+		}
+	}
+
+	ignores := getIgnoresForLine(&f, 0)
+	for _, c := range f.Rules {
+		if c.Scope == fileScope || c.Scope == pathScope {
+			lineIdx := -1
+			lineNo := 0
+			if c.ExcludePaths != nil && c.ExcludePaths.MatchString(f.Path) {
+				continue
+			}
+			// TODO: currently does not support checking for file level ignores or path ignores
+			if c.IncludePaths != nil && c.IncludePaths.MatchString(f.Path) {
+				if _, ok := ignores[c.Id]; !ok {
+					if c.Fn(f.Path, lineIdx, content) {
+						f.Findings = append(f.Findings, Finding{
+							Path:      f.Path,
+							Line:      content,
+							LineIndex: lineIdx,
+							LineNo:    lineNo,
+							Rule:      c,
+							RuleId:    c.Id,
+						})
+					}
+				}
+			}
 		}
 	}
 

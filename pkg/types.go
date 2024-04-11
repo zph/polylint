@@ -1,4 +1,4 @@
-package main
+package polylint
 
 import (
 	"regexp"
@@ -40,7 +40,7 @@ type Finding struct {
 	Line      string
 	LineIndex int
 	LineNo    int
-	Rule      *Rule
+	Rule      Rule
 	RuleId    string
 }
 

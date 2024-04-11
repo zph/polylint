@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	"testing"
+
+	pl "github.com/zph/polylint/pkg"
 )
 
 const (
@@ -48,12 +50,12 @@ func TestProcessFile(t *testing.T) {
 	}
 	for idx, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cfg, err := LoadConfigFile(simpleConfigFile)
+			cfg, err := pl.LoadConfigFile(simpleConfigFile)
 			if err != nil {
 				t.Fatalf("Error loading config file: %v", err)
 			}
 
-			result, err := ProcessFile(tt.content, tt.path, cfg)
+			result, err := pl.ProcessFile(tt.content, tt.path, cfg)
 			if err != tt.expectedErr {
 				t.Errorf("Test #%d Error was incorrect, got: %v, want: %v.", idx, err, tt.expectedErr)
 			}
@@ -64,7 +66,7 @@ func TestProcessFile(t *testing.T) {
 	}
 }
 
-var simpleConfigFilePath = "./examples/simple.yml"
+var simpleConfigFilePath = "./examples/simple.yaml"
 
 func loadTestingConfigFile(path string) (string, error) {
 	content, err := os.ReadFile(path)
@@ -88,7 +90,7 @@ func TestConfigFileParsing(t *testing.T) {
 	}
 	for idx, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, _ := LoadConfigFile(tt.content)
+			result, _ := pl.LoadConfigFile(tt.content)
 			if len(result.Rules) != tt.expectedRuleCount {
 				t.Errorf("Test #%d Result was incorrect, findings count: got: %d, want: %d.\n", idx, len(result.Rules), tt.expectedRuleCount)
 			}

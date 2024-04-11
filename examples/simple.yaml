@@ -4,7 +4,7 @@ version: v0.0.1
 # TODO: Future extension to config file to allow for including other configuration's rules
 # these will be appended to the rules defined locally
 includes:
-- path: examples/basic.yml
+- path: examples/basic.yaml
   sha: 4f641f6ccd8582e0e3f33e295d2c4d6a07495a49c0f7cee5aee318720b113d23
 # - path: https://example.com/other/config.yml
 #   sha: 123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
