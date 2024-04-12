@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
+	"github.com/spf13/viper"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
 )
@@ -21,7 +22,6 @@ import (
 func extractIgnoresFromLine(line string, lineNo int, f *FileReport) error {
 	if strings.Contains(line, "polylint disable") {
 		chunks := strings.SplitN(line, "=", 2)
-		// chunks[0] = `# polylint disable.*` up to the equals sign
 		directive := strings.TrimSpace(strings.SplitN(chunks[0], "polylint", 2)[1])
 		ignoresStr := strings.TrimSpace(chunks[1])
 		if directive == "disable-for-file" {
@@ -108,14 +108,14 @@ func LoadConfigFile(content string) (ConfigFile, error) {
 	}
 
 	if !semver.IsValid(rawConfig.Version) {
-		fmt.Printf("Error: Config version %s is newer than binary version %s\n", rawConfig.Version, PolylintVersion)
+		fmt.Printf("Error: Config version %s is newer than binary version %s\n", rawConfig.Version, viper.GetString("binary_version"))
 		fmt.Println(semver.IsValid(rawConfig.Version))
 		panic("Invalid version due to semver incompatibility")
 	}
 
 	// If version file is too new for binary version
 	if semver.Compare(rawConfig.Version, PolylintVersion) == 1 {
-		fmt.Printf("Warning: config file version %s is newer than binary version %s\n", rawConfig.Version, PolylintVersion)
+		fmt.Printf("Warning: config file version %s is newer than binary version %s\n", rawConfig.Version, viper.GetString("binary_version"))
 	}
 
 	config.Version = rawConfig.Version

@@ -39,4 +39,10 @@
   - [ ] JSON reporter
 - [ ] Configurable logging (log levels for debugging and k/v log values)
 - [ ] Add `init` command to create a default named config file
+- [ ] Remove panics that are poor programming style
 - [ ] Add testing for config files... lines, path
+- [ ] Setup goreleaser for releases
+  - [ ] Setup version bumper
+  - [ ] Ensure version is embedded into cobra cli and available for --version
+- [ ] Add way to pipe to exec process and non-zero exit is a failing to provide builtin, js, exec mechanisms
+- [ ] Setup version reading https://goreleaser.com/cookbooks/using-main.version/
