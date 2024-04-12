@@ -14,6 +14,8 @@ before:
     - go mod tidy
     # you may remove this if you don't need go generate
     - go generate ./...
+    - echo '{"version":"{{ .Version }}", "tag":"{{ .Tag }}", "commit":"{{ .Commit }}", "date":"{{ .Date }}"}' >> pkg/VERSION.json
+    - git add pkg/VERSION.json && git commit -m "Update VERSION.json"
 
 builds:
   - env: []
@@ -21,8 +23,8 @@ builds:
       - linux
       - windows
       - darwin
-    ldflags: |
-      -s -w -X cmd.version={{.Version}} -X cmd.commit={{.Commit}} -X cmd.date={{.Date}} -X cmd.builtBy=goreleaser
+    ldflags:
+      - "-s -w -X 'github.com/zph/polylint/cmd.version={{.Version}}' -X 'github.com/zph/polylint/cmd.commit={{.Commit}}' -X 'github.com/zph/polylint/cmd.date={{.Date}}' -X 'github.com/zph/polylint/cmd.builtBy=goreleaser'"
 
 archives:
   - format: tar.gz
