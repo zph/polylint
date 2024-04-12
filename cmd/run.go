@@ -49,7 +49,10 @@ func Run(cmd *cobra.Command, args []string) (int, []error) {
 				return err
 			}
 
-			// Check if the file has the extension
+			// Causes 4x slowdown in benchmarks on project with large node_modules folder
+			// if we use IsRegular() instead of isDir()
+			// Regular mode = non-dir, non-symlink etcs
+			// TODO(zph) investigate this issue and find a better solution
 			if !info.IsDir() {
 				content, err := os.ReadFile(path)
 
@@ -66,7 +69,6 @@ func Run(cmd *cobra.Command, args []string) (int, []error) {
 				if len(result.Findings) > 0 {
 					fmt.Printf("\n%s: violations count %d\n", result.Path, len(result.Findings))
 					for idx, finding := range result.Findings {
-						// TODO: figure out why the rule embedded is wrong
 						fmt.Printf("%d: Line %3d %30s %20s\n", idx+1, finding.LineNo, finding.RuleId, finding.Rule.Description)
 					}
 					exitCode = 1

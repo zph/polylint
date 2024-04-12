@@ -40,9 +40,16 @@
 - [ ] Configurable logging (log levels for debugging and k/v log values)
 - [ ] Add `init` command to create a default named config file
 - [ ] Remove panics that are poor programming style
-- [ ] Add testing for config files... lines, path
-- [ ] Setup goreleaser for releases
+- [x] Add testing for config files... lines, path
+- [x] Setup goreleaser for releases
   - [ ] Setup version bumper
-  - [ ] Ensure version is embedded into cobra cli and available for --version
+  - [x] Ensure version is embedded into cobra cli and available for --version
 - [ ] Add way to pipe to exec process and non-zero exit is a failing to provide builtin, js, exec mechanisms
-- [ ] Setup version reading https://goreleaser.com/cookbooks/using-main.version/
+- [x] Setup version reading https://goreleaser.com/cookbooks/using-main.version/
+- [x] Add this as a hermit-package in zph/hermit-packages
+
+## Performance
+- [ ] Setup support for gitignore and global gitignore to avoid reading things like node_modules :yawning_face:
+- [ ] Setup parallelism for larger repos
+  - [ ] Requires reworking how we use goja functions because those VMs are not thread safe
+  - [ ] Could setup a worker pool of VMs? Or could provision new VM for each fn call....
