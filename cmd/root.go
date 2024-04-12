@@ -9,7 +9,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	pkg "github.com/zph/polylint/pkg"
 )
 
 var (
@@ -43,9 +42,6 @@ func init() {
 }
 
 func setVersion() {
-	if version == "v0.0.1" {
-		version = pkg.LibMetadata.Version
-	}
 	viper.Set("binary_version", version)
 	rootCmd.Version = version
 }

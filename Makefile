@@ -8,7 +8,7 @@ build:
 
 run:
 	go build -o ${BINARY_PATH}
-	${BINARY_NAME} ~/src/runbook
+	${BINARY_NAME} run ~/src/runbook
 
 clean:
 	go clean
@@ -23,5 +23,8 @@ test-watch:
 benchmark:
 	hyperfine --ignore-failure -- "./bin/polylint --config examples/simple.yaml run ~/src/runbook"
 
-build-dry-run:
+release-dry-run:
 	goreleaser release --clean --skip publish --snapshot
+
+release:
+	goreleaser release --clean

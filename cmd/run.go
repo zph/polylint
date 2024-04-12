@@ -67,7 +67,7 @@ func Run(cmd *cobra.Command, args []string) (int, []error) {
 					fmt.Printf("\n%s: violations count %d\n", result.Path, len(result.Findings))
 					for idx, finding := range result.Findings {
 						// TODO: figure out why the rule embedded is wrong
-						fmt.Printf("%d: %s:%d %s %s\n", idx+1, result.Path, finding.LineNo, finding.RuleId, finding.Rule.Description)
+						fmt.Printf("%d: Line %3d %30s %20s\n", idx+1, finding.LineNo, finding.RuleId, finding.Rule.Description)
 					}
 					exitCode = 1
 				}
