@@ -39,3 +39,4 @@
   - [ ] JSON reporter
 - [ ] Configurable logging (log levels for debugging and k/v log values)
 - [ ] Add `init` command to create a default named config file
+- [ ] Add testing for config files... lines, path

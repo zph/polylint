@@ -150,9 +150,9 @@ func LoadConfigFile(content string) (ConfigFile, error) {
 		}
 
 		// TODO: add tests
-		if include.SHA != "" {
-			if SHA256(content) != include.SHA {
-				panic(fmt.Sprintf("WARNING: content does not match expected hash %s!= %s\n", include.SHA, SHA256(content)))
+		if include.Hash != "" {
+			if !CheckContentHash(include.Hash, content) {
+				panic(fmt.Sprintf("WARNING: content does not match expected hash.\n Actual %s!= Expected %s\n", include.Hash, "sha256:"+SHA256(content)))
 			}
 		}
 
@@ -164,6 +164,40 @@ func LoadConfigFile(content string) (ConfigFile, error) {
 	}
 
 	return config, nil
+}
+
+func CheckContentHash(expectedHash, content string) bool {
+	chunks := strings.Split(expectedHash, ":")
+	var algo string
+	var hash string
+
+	algo = "sha256"
+	if len(chunks) == 2 {
+		algo = strings.ToLower(chunks[0])
+		hash = chunks[1]
+	} else {
+		hash = expectedHash
+	}
+
+	switch algo {
+	case "sha256":
+		return SHA256(content) == hash
+	default:
+		return SHA256(content) == hash
+	}
+}
+
+func ValidateConfigFile(config ConfigFile) error {
+	// Ensure uniqueness of rule ids
+	ids := make(map[string]bool)
+	for _, rule := range config.Rules {
+		if _, ok := ids[rule.Id]; !ok {
+			ids[rule.Id] = true
+		} else {
+			panic(fmt.Sprintf("Received duplicate id %s", rule.Id))
+		}
+	}
+	return nil
 }
 
 func getFileContentFromURI(u *url.URL) string {

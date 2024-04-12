@@ -17,13 +17,11 @@ import (
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run [files or folder]",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
+	Short: "Run linter",
+	Long: `Run linter against files or root folder(s)
 and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+> polylint --config .polylint run src/ lib/
+`,
 	Args: cobra.MinimumNArgs(1),
 	Run:  RunCmd,
 }
@@ -33,11 +31,6 @@ func Run(cmd *cobra.Command, args []string) (int, []error) {
 	exitCode = 0
 	var errs []error
 	for _, root := range args {
-		// Resolve symlinks
-		s, err := os.Readlink(viper.ConfigFileUsed())
-		if err == nil {
-			cfgFile = s
-		}
 		configRaw, err := os.ReadFile(viper.ConfigFileUsed())
 
 		if err != nil {
@@ -103,14 +96,4 @@ func RunCmd(cmd *cobra.Command, args []string) {
 
 func init() {
 	rootCmd.AddCommand(runCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// runCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

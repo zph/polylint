@@ -1,11 +1,10 @@
 ---
 # Must be lower than or equal the version of the polylint tool to be valid
 version: v0.0.1
-# TODO: Future extension to config file to allow for including other configuration's rules
-# these will be appended to the rules defined locally
+# Includes can be either filesystem local or http(s)
 includes:
 - path: examples/basic.yaml
-  sha: 4f641f6ccd8582e0e3f33e295d2c4d6a07495a49c0f7cee5aee318720b113d23
+  hash: sha256:90e8cd4f24da96045625317d4f2cb5940f897bd13af1a54d36256c18c57ed44d
 # - path: https://example.com/other/config.yml
 #   sha: 123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 rules:
@@ -13,7 +12,7 @@ rules:
   description: "Don't use print()"
   recommendation: "Use logging instead."
   severity: low
-  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  link: https://examples.com/wiki/no-print
   include_paths: '\.py$'
   exclude_paths: null
   fn:
@@ -25,7 +24,7 @@ rules:
   description: "Don't use logging"
   recommendation: "Use print instead."
   severity: low
-  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  link: https://examples.com/wiki/no-logging
   include_paths: '\.py$'
   exclude_paths: null
   fn:
@@ -37,7 +36,7 @@ rules:
   description: "Don't use print()"
   recommendation: "Use logging instead."
   severity: low
-  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  link: https://examples.com/wiki/no-print-js
   include_paths: '\.py$'
   exclude_paths: null
   fn:
@@ -52,7 +51,7 @@ rules:
   description: "Don't use print()"
   recommendation: "Use logging instead."
   severity: low
-  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  link: https://examples.com/wiki/no-print-js-file-level
   include_paths: '\.py$'
   exclude_paths: null
   fn:
@@ -67,7 +66,7 @@ rules:
   description: "Don't use print()"
   recommendation: "Use logging instead."
   severity: low
-  link: https://docs.openstack.org/bandit/latest/plugins/b302_no_print.html
+  link: https://examples.com/wiki/no-print-js-path-level
   include_paths: '\.py$'
   exclude_paths: null
   fn:

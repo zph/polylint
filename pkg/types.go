@@ -94,8 +94,8 @@ type RawConfig struct {
 
 type IncludeRaw struct {
 	Path string `yaml:"path"`
-	// SHA256 of the file contents
-	SHA string `yaml:"sha"`
+	// Hash of the file contents prefixed with the algorithm
+	Hash string `yaml:"hash"`
 }
 
 type ConfigFile struct {
