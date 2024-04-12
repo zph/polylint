@@ -24,4 +24,4 @@ benchmark:
 	hyperfine --ignore-failure -- "./bin/polylint --config examples/simple.yaml run ~/src/runbook"
 
 build-dry-run:
-	goreleaser release --clean --skip publish
+	goreleaser release --clean --skip publish --snapshot

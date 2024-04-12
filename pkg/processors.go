@@ -114,7 +114,7 @@ func LoadConfigFile(content string) (ConfigFile, error) {
 	}
 
 	// If version file is too new for binary version
-	if semver.Compare(rawConfig.Version, PolylintVersion) == 1 {
+	if semver.Compare(rawConfig.Version, viper.GetString("binary_version")) == 1 {
 		fmt.Printf("Warning: config file version %s is newer than binary version %s\n", rawConfig.Version, viper.GetString("binary_version"))
 	}
 
