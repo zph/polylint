@@ -6,6 +6,7 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 
+# TODO: rename file outputs for release assets to be lowercase not capital
 version: 1
 
 before:
@@ -27,9 +28,10 @@ builds:
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
+    # Note removal of "title" because it uppercases the first letter
     name_template: >-
       {{ .ProjectName }}_
-      {{- title .Os }}_
+      {{- .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
