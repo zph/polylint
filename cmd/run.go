@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	pl "github.com/zph/polylint/pkg"
@@ -30,6 +31,7 @@ func Run(cmd *cobra.Command, args []string) (int, []error) {
 	var exitCode int
 	exitCode = 0
 	var errs []error
+	var results []pl.FileReport
 	for _, root := range args {
 		configRaw, err := os.ReadFile(viper.ConfigFileUsed())
 
@@ -66,19 +68,48 @@ func Run(cmd *cobra.Command, args []string) (int, []error) {
 					return fmt.Errorf("error processing file %q: %v", path, err2)
 				}
 
-				if len(result.Findings) > 0 {
-					fmt.Printf("\n%s: violations count %d\n", result.Path, len(result.Findings))
-					for idx, finding := range result.Findings {
-						fmt.Printf("%d: Line %3d %30s %20s\n", idx+1, finding.LineNo, finding.RuleId, finding.Rule.Description)
-					}
-					exitCode = 1
-				}
+				results = append(results, result)
 			}
 
 			return nil
 		})
 		errs = append(errs, err)
 	}
+
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"File", "#", "Scope", "Rule Id", "Recommendation", "Link"})
+
+	summary := table.NewWriter()
+	summary.SetOutputMirror(os.Stdout)
+	summary.AppendHeader(table.Row{"File", "Violations"})
+	summary.SortBy([]table.SortBy{
+		{Name: "Violations", Mode: table.Dsc},
+	})
+	for _, result := range results {
+		if len(result.Findings) > 0 {
+			summary.AppendRow([]interface{}{result.Path, len(result.Findings)})
+			for idx, finding := range result.Findings {
+				var scope string
+				if finding.Rule.Scope == "file" || finding.Rule.Scope == "path" {
+					scope = fmt.Sprintf("%s", finding.Rule.Scope)
+				} else {
+					scope = fmt.Sprintf("%s %3d", finding.Rule.Scope, finding.LineNo)
+				}
+				t.AppendRow([]interface{}{
+					result.Path, idx + 1, scope, finding.RuleId, finding.Rule.Recommendation, finding.Rule.Link,
+				})
+				exitCode += 1
+			}
+		}
+	}
+	summary.Render()
+	t.Render()
+
+	if exitCode > 255 {
+		exitCode = 255
+	}
+
 	nonNilErrors := make([]error, 0)
 	for _, e := range errs {
 		if e != nil {
