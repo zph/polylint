@@ -22,8 +22,9 @@ builds:
       - linux
       - windows
       - darwin
+    # Note the need for prefixing a leading v
     ldflags:
-      - "-s -w -X 'github.com/zph/polylint/cmd.version={{.Version}}' -X 'github.com/zph/polylint/cmd.commit={{.Commit}}' -X 'github.com/zph/polylint/cmd.date={{.Date}}' -X 'github.com/zph/polylint/cmd.builtBy=goreleaser'"
+      - "-s -w -X 'github.com/zph/polylint/cmd.version=v{{.Version}}' -X 'github.com/zph/polylint/cmd.commit={{.Commit}}' -X 'github.com/zph/polylint/cmd.date={{.Date}}' -X 'github.com/zph/polylint/cmd.builtBy=goreleaser'"
 
 archives:
   - format: tar.gz
