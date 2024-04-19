@@ -57,14 +57,22 @@ func initConfig() {
 
 		// Search config in home directory with name ".polylint" (without extension).
 		viper.AddConfigPath(".")
+		viper.AddConfigPath("../.")
+		viper.AddConfigPath("../../.")
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".polylint")
 	}
 
+	viper.SetEnvPrefix("POLYLINT")
 	viper.AutomaticEnv() // read in environment variables that match
 
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Fprintln(os.Stderr, "Error reading config file:", viper.ConfigFileUsed())
+		// Error means that it's a non-standard configuration file but that's ok
+		if err != viper.UnsupportedConfigError("polylint") {
+			fmt.Fprintf(os.Stderr, "Error reading config file: %s\nError: %e", viper.ConfigFileUsed(), err)
+		}
+	} else {
+		fmt.Printf("Using config file: %s\n", viper.ConfigFileUsed())
 	}
 }

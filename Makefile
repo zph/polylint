@@ -6,13 +6,15 @@ all: build test
 build:
 	go build -o ${BINARY_PATH}
 
-run:
-	go build -o ${BINARY_PATH}
+run: build
 	${BINARY_NAME} run ~/src/runbook
 
 clean:
 	go clean
 	rm ${BINARY_PATH}
+
+install: build
+	cp -f ./bin/polylint ~/bin/
 
 test:
 	go test -v .
