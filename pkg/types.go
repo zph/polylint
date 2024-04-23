@@ -6,12 +6,19 @@ import (
 
 type SeverityLevel int
 type Scope string
+type FnType string
 
 const (
 	unknownSeverity SeverityLevel = iota
 	lowSeverity
 	mediumSeverity
 	highSeverity
+)
+
+const (
+	builtinType FnType = "builtin"
+	jsType      FnType = "js"
+	wasmType    FnType = "wasm"
 )
 
 const (
@@ -60,7 +67,7 @@ type Rule struct {
 }
 
 type Fn struct {
-	Type  string
+	Type  FnType
 	Scope Scope
 	Name  string
 	Args  []any

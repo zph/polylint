@@ -71,3 +71,16 @@ rules:
     scope: path
     name: fn
     body: const fn = (path, _i, _l) => path.includes('print')
+
+- id: no-python-in-path
+  description: Don't use python here
+  recommendation: None
+  severity: low
+  link: https://examples.com/wiki/no-print-js-path-level
+  include_paths: '\.py$'
+  exclude_paths: null
+  fn:
+    type: wasm
+    scope: path
+    name: path_validator
+    body: ./plugins/test-plugin.wasm

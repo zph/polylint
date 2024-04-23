@@ -1,7 +1,9 @@
 package polylint
 
 import (
+	"context"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -13,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
+	extism "github.com/extism/go-sdk"
 	"github.com/spf13/viper"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
@@ -285,6 +288,8 @@ func BuildLineFn(f RawFn) RuleFunc {
 		return buildLineFnBuiltin(f)
 	case "js":
 		return buildJsFn(f)
+	case "wasm":
+		return buildWasmFn(f)
 	default:
 		panic(fmt.Sprintf("unknown type %s", f.Type))
 	}
@@ -296,6 +301,8 @@ func BuildFileScopeFn(f RawFn) RuleFunc {
 		return BuildFileFnBuiltin(f)
 	case "js":
 		return BuildFileFnJs(f)
+	case "wasm":
+		return buildWasmFn(f)
 	default:
 		panic(fmt.Sprintf("unknown type %s", f.Type))
 	}
@@ -340,6 +347,8 @@ func BuildPathScopeFn(f RawFn) RuleFunc {
 		return BuildPathFnBuiltin(f)
 	case "js":
 		return BuildPathFnJs(f)
+	case "wasm":
+		return buildWasmFn(f)
 	default:
 		panic(fmt.Sprintf("unknown type %s", f.Type))
 	}
@@ -392,6 +401,53 @@ func buildJsFn(f RawFn) RuleFunc {
 	}
 
 	return fn
+}
+
+func buildWasmFn(f RawFn) RuleFunc {
+	var location []extism.Wasm
+	if(strings.HasPrefix(f.Body, "http")) {
+		location = append(location, extism.WasmUrl{Url: f.Body})
+	} else {
+		location = append(location, extism.WasmFile{Path: f.Body})
+	}
+	manifest := extism.Manifest{
+		Wasm: location,
+	}
+
+	ctx := context.Background()
+	config := extism.PluginConfig{
+		EnableWasi: true,
+	}
+
+	plugin, err := extism.NewPlugin(ctx, manifest, config, []extism.HostFunction{})
+	if err != nil {
+		fmt.Printf("Failed to initialize plugin: %v\n", err)
+		os.Exit(1)
+	}
+
+	return func(path string, idx int, line string) bool {
+		args := RuleFuncArgs{path, idx, line}
+		b, err := json.Marshal(&args)
+		if err != nil {
+			panic(err)
+		}
+
+		exit, bytes, err := plugin.CallWithContext(ctx, f.Name, b)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(int(exit))
+		}
+		var result RuleFuncResult
+		json.Unmarshal(bytes, &result)
+
+		return result.Value
+	}
+}
+
+type RuleFuncArgs [3]interface{}
+
+type RuleFuncResult struct {
+	Value bool
 }
 
 func ProcessFile(content string, path string, cfg ConfigFile) (FileReport, error) {
