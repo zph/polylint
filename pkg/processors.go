@@ -404,12 +404,39 @@ func buildJsFn(f RawFn) RuleFunc {
 }
 
 func buildWasmFn(f RawFn) RuleFunc {
-	var location []extism.Wasm
-	if(strings.HasPrefix(f.Body, "http")) {
-		location = append(location, extism.WasmUrl{Url: f.Body})
-	} else {
-		location = append(location, extism.WasmFile{Path: f.Body})
+	hash, err := f.GetMetadataHash()
+	if err != nil {
+		fmt.Printf("Warning: cannot find metadata hash for %s\n", f.Body)
 	}
+	var content []byte
+
+	// TODO: handle null case of hash
+	if hash != "" {
+		content, err = f.GetWASMFromCache(hash)
+	}
+	if err != nil {
+		if strings.HasPrefix(f.Body, "http") {
+			content, err = f.GetWASMFromUrl(f.Body)
+		} else {
+			content, err = f.GetWASMFromPath(f.Body)
+		}
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	ok := f.CheckWASMHash(content, hash)
+	if !ok && hash != "" {
+		fmt.Printf("hash mismatch for %s", f.Body)
+	}
+	f.WriteWASMToCache(content)
+
+	var location []extism.Wasm
+	location = append(location, extism.WasmData{
+		Data: content,
+		Hash: hash,
+	})
+
 	manifest := extism.Manifest{
 		Wasm: location,
 	}

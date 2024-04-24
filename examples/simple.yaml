@@ -84,3 +84,5 @@ rules:
     scope: path
     name: path_validator
     body: ./plugins/test-plugin.wasm
+    metadata:
+      sha256: f2880b9d1a2f70f7eddca65c7aa539483c800653669e5a070b8cb3b11a199eca
