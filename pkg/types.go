@@ -167,7 +167,7 @@ func (f RawFn) CheckWASMHash(content []byte, hash string) bool {
 	actual := fmt.Sprintf("%x", bs)
 	comparison := actual == hash
 	if !comparison {
-		fmt.Printf("Comparison failed for desired sha256 %s and actual: %s\n", hash, actual)
+		logz.Infof("Comparison failed for desired sha256 %s and actual: %s\n", hash, actual)
 	}
 	return comparison
 }
@@ -178,7 +178,7 @@ func (f RawFn) GetWASMFromCache(hash string) ([]byte, error) {
 		return nil, err
 	}
 	// TODO: move to debug level logging
-	// fmt.Printf("Success fetching file from cache %s\n", hash)
+	logz.Debugf("Success fetching file from cache %s\n", hash)
 	return os.ReadFile(path.Join(dir, hash))
 }
 

@@ -44,7 +44,7 @@ func extractIgnoresFromLine(line string, lineNo int, f *FileReport) error {
 				f.Ignores = append(f.Ignores, Ignore{Scope: pathScope, SourceLineNo: lineNo, LineNo: 0, Id: ignore})
 			}
 		} else {
-			fmt.Printf("WARNING: directive for polylint not recognized on line %d %s %s\n", lineNo, directive, ignoresStr)
+			logz.Warnf("WARNING: directive for polylint not recognized on line %d %s %s\n", lineNo, directive, ignoresStr)
 			return nil
 		}
 	}
@@ -101,24 +101,27 @@ func LoadConfigFile(content string) (ConfigFile, error) {
 	var config ConfigFile
 	err := yaml.Unmarshal([]byte(content), &rawConfig)
 	if err != nil {
-		fmt.Printf("Error unmarshalling YAML: %v", err)
+		logz.Errorf("Error unmarshalling YAML: %v", err)
 		return ConfigFile{}, err
 	}
 
 	if !strings.HasPrefix(rawConfig.Version, "v") {
-		fmt.Printf("Error: config file version must start with a 'v' but was %s\n", rawConfig.Version)
+		logz.Errorf("Error: config file version must start with a 'v' but was %s\n", rawConfig.Version)
 		panic("Invalid version due to semver incompatibility")
 	}
 
 	if !semver.IsValid(rawConfig.Version) {
-		fmt.Printf("Error: Config version %s is newer than binary version %s\n", rawConfig.Version, viper.GetString("binary_version"))
-		fmt.Println(semver.IsValid(rawConfig.Version))
+		logz.Errorf("Error: Config version %s is newer than binary version %s\n", rawConfig.Version, viper.GetString("binary_version"))
+		logz.Errorln(semver.IsValid(rawConfig.Version))
 		panic("Invalid version due to semver incompatibility")
 	}
 
 	// If version file is too new for binary version
 	if semver.Compare(rawConfig.Version, viper.GetString("binary_version")) == 1 {
-		fmt.Printf("Warning: config file version %s is newer than binary version %s\n", rawConfig.Version, viper.GetString("binary_version"))
+		_ = 1
+		// TODO: determine how to handle version for version check when not set in tests
+		// Ignore for now until we can control the output
+		//logz.Warnf("Warning: config file version %s is newer than binary version %s\n", rawConfig.Version, viper.GetString("binary_version"))
 	}
 
 	config.Version = rawConfig.Version
@@ -406,7 +409,7 @@ func buildJsFn(f RawFn) RuleFunc {
 func buildWasmFn(f RawFn) RuleFunc {
 	hash, err := f.GetMetadataHash()
 	if err != nil {
-		fmt.Printf("Warning: cannot find metadata hash for %s\n", f.Body)
+		logz.Warnf("Warning: cannot find metadata hash for %s\n", f.Body)
 	}
 	var content []byte
 
@@ -427,7 +430,7 @@ func buildWasmFn(f RawFn) RuleFunc {
 
 	ok := f.CheckWASMHash(content, hash)
 	if !ok && hash != "" {
-		fmt.Printf("hash mismatch for %s", f.Body)
+		logz.Errorf("hash mismatch for %s", f.Body)
 	}
 	f.WriteWASMToCache(content)
 
@@ -448,7 +451,7 @@ func buildWasmFn(f RawFn) RuleFunc {
 
 	plugin, err := extism.NewPlugin(ctx, manifest, config, []extism.HostFunction{})
 	if err != nil {
-		fmt.Printf("Failed to initialize plugin: %v\n", err)
+		logz.Errorf("Failed to initialize plugin: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -461,7 +464,7 @@ func buildWasmFn(f RawFn) RuleFunc {
 
 		exit, bytes, err := plugin.CallWithContext(ctx, f.Name, b)
 		if err != nil {
-			fmt.Println(err)
+			logz.Errorln(err)
 			os.Exit(int(exit))
 		}
 		var result RuleFuncResult
@@ -488,7 +491,7 @@ func ProcessFile(content string, path string, cfg ConfigFile) (FileReport, error
 	for idx, line := range lines {
 		err := processLine(line, idx, &f)
 		if err != nil {
-			fmt.Printf("ERROR: %s\n", err)
+			logz.Errorf("ERROR: %s\n", err)
 			return FileReport{}, err
 		}
 	}
