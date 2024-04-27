@@ -5,21 +5,21 @@
 class Polylint < Formula
   desc "Polylint: Extensible generic linter"
   homepage "https://github.com/zph/polylint"
-  version "0.0.3"
+  version "0.0.5"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/zph/polylint/releases/download/v0.0.3/polylint_darwin_x86_64.tar.gz"
-      sha256 "875da672de60ddf67e7d94f743e38aeb6d12c6bb9cd639a0556c1cb7ec5b5c72"
+      url "https://github.com/zph/polylint/releases/download/v0.0.5/polylint_darwin_x86_64.tar.gz"
+      sha256 "80f1447fbcee99c9cee2789c5fe3048379ba60f3dc481516ced70e78016f34a2"
 
       def install
         bin.install "polylint"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/zph/polylint/releases/download/v0.0.3/polylint_darwin_arm64.tar.gz"
-      sha256 "836ecad62c0578c9ece92628cb86afa141aad09bc61269ce0b630a92d75b167d"
+      url "https://github.com/zph/polylint/releases/download/v0.0.5/polylint_darwin_arm64.tar.gz"
+      sha256 "d7221479c7d0635c9d9960584bb3d68203c3d813094510a2586cb509d6da39ca"
 
       def install
         bin.install "polylint"
@@ -29,16 +29,16 @@ class Polylint < Formula
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/zph/polylint/releases/download/v0.0.3/polylint_linux_x86_64.tar.gz"
-      sha256 "c43386d61898f9bc04051ef55c0977d22dfecf8a1176930c314ff374efe2b255"
+      url "https://github.com/zph/polylint/releases/download/v0.0.5/polylint_linux_x86_64.tar.gz"
+      sha256 "814fb8775b3ac202ba5f0e67d88c98ca021c98dbed57977ffcfe35c88cb73ee8"
 
       def install
         bin.install "polylint"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/zph/polylint/releases/download/v0.0.3/polylint_linux_arm64.tar.gz"
-      sha256 "32aad77d883b9f6acc8d37098679a0f890e4150bcfd42c34be86ecc9887d03ce"
+      url "https://github.com/zph/polylint/releases/download/v0.0.5/polylint_linux_arm64.tar.gz"
+      sha256 "b40274c0fa63aabd0e3a9461a2bd3c2db13acb7b2533be49e7dfc2b4b3dd5263"
 
       def install
         bin.install "polylint"
