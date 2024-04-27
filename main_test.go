@@ -40,13 +40,13 @@ func TestProcessFile(t *testing.T) {
 		findingsCount int
 		expectedErr   error
 	}{
-		{"Basic test without ignores", `print("A")`, "example.py", 4, nil},
-		{"Basic test for-file ignore", forFileIgnore, "example.py", 2, nil},
-		{"Basic test next-line ignore", nextLineIgnore, "example.py", 2, nil},
-		{"Basic test next-line ignore shorthand", nextLineIgnoreShorthand, "example.py", 3, nil},
-		{"Basic test next-line ignore doesn't apply", nextLineIgnoreDoesntApply, "example.py", 4, nil},
-		{"Basic test with faulty ignore statement", fileWithFaultyIgnoreStatement, "example.py", 4, nil},
-		{"Basic test with banned filename", nextLineIgnore, "print.py", 3, nil},
+		{"Basic test without ignores", `print("A")`, "example.py", 5, nil},
+		{"Basic test for-file ignore", forFileIgnore, "example.py", 3, nil},
+		{"Basic test next-line ignore", nextLineIgnore, "example.py", 3, nil},
+		{"Basic test next-line ignore shorthand", nextLineIgnoreShorthand, "example.py", 4, nil},
+		{"Basic test next-line ignore doesn't apply", nextLineIgnoreDoesntApply, "example.py", 5, nil},
+		{"Basic test with faulty ignore statement", fileWithFaultyIgnoreStatement, "example.py", 5, nil},
+		{"Basic test with banned filename", nextLineIgnore, "print.py", 4, nil},
 	}
 	for idx, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -86,7 +86,7 @@ func TestConfigFileParsing(t *testing.T) {
 		content           string
 		expectedRuleCount int
 	}{
-		{"basic config file with 1 rule", simpleConfigFile, 6},
+		{"basic config file with 1 rule", simpleConfigFile, 7},
 	}
 	for idx, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

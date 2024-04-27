@@ -1,17 +1,30 @@
 package polylint
 
 import (
+	"crypto/sha256"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path"
 	"regexp"
 )
 
 type SeverityLevel int
 type Scope string
+type FnType string
 
 const (
 	unknownSeverity SeverityLevel = iota
 	lowSeverity
 	mediumSeverity
 	highSeverity
+)
+
+const (
+	builtinType FnType = "builtin"
+	jsType      FnType = "js"
+	wasmType    FnType = "wasm"
 )
 
 const (
@@ -60,7 +73,7 @@ type Rule struct {
 }
 
 type Fn struct {
-	Type  string
+	Type  FnType
 	Scope Scope
 	Name  string
 	Args  []any
@@ -73,6 +86,100 @@ type RawFn struct {
 	Name  string
 	Args  []any
 	Body  string
+
+	// sha256: sha256 hash in hex form
+	Metadata map[string]any
+}
+
+func (f RawFn) GetMetadataHash() (string, error) {
+	hash, ok := f.Metadata["sha256"]
+
+	if !ok {
+		return "", fmt.Errorf("could not get sha256 hash from metadata for: %s", f.Body)
+	}
+
+	h, ok := hash.(string)
+
+	if !ok {
+		return "", fmt.Errorf("could not get sha256 hash from metadata for: %s", f.Body)
+	}
+	return h, nil
+}
+
+func (f RawFn) GetWASMFromUrl(url string) ([]byte, error) {
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Write the body to file
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return body, err
+}
+
+func (f RawFn) GetWASMFromPath(path string) ([]byte, error) {
+	// Create the file
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return content, nil
+}
+
+func (f RawFn) WriteWASMToCache(content []byte) (bool, error) {
+	// Make dir in ~/.local/cache/polylint/cache/SHA256
+	h := sha256.New()
+
+	h.Write(content)
+
+	bs := h.Sum(nil)
+
+	hex := fmt.Sprintf("%x", bs)
+	output_folder, err := f.CacheDirWASM()
+	if err != nil {
+		return false, err
+	}
+	os.MkdirAll(output_folder, 0755)
+	os.WriteFile(path.Join(output_folder, hex), content, 0755)
+	return true, nil
+}
+
+func (f RawFn) CacheDirWASM() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return path.Join(home, ".local", "cache", "polylint", "cache"), nil
+}
+
+func (f RawFn) CheckWASMHash(content []byte, hash string) bool {
+	h := sha256.New()
+
+	h.Write(content)
+
+	bs := h.Sum(nil)
+
+	actual := fmt.Sprintf("%x", bs)
+	comparison := actual == hash
+	if !comparison {
+		logz.Infof("Comparison failed for desired sha256 %s and actual: %s\n", hash, actual)
+	}
+	return comparison
+}
+
+func (f RawFn) GetWASMFromCache(hash string) ([]byte, error) {
+	dir, err := f.CacheDirWASM()
+	if err != nil {
+		return nil, err
+	}
+	// TODO: move to debug level logging
+	logz.Debugf("Success fetching file from cache %s\n", hash)
+	return os.ReadFile(path.Join(dir, hash))
 }
 
 type RawRule struct {
